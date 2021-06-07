@@ -1,0 +1,9 @@
+Package: com.atrt7.likeify
+Name: Likeify
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Like multiple songs quickly in Spotify!
+Maintainer: atrt7
+Author: atrt7
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
