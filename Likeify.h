@@ -17,9 +17,146 @@
 #import "SpotifyHeaders/HUGSComponentLayoutManager.h"
 #import "SpotifyHeaders/HUBComponentLayoutManager.h"*/
 
-@class HUBContainerView, SPTask;
+@class UBIInteractionEvent, UBIImpressionEvent, HUBContainerView, SPTask;
 
-@protocol SPTCollectionPlatform, HUBViewModel, HUBComponentModel, HUBComponentLayoutManager, SPTFreeTierEntityFeedbackButtonViewModelDelegate, SPTFreeTierEntityFeedbackButtonViewModel, SPTContextMenuActionsProvider;
+@protocol SPTUBIPDTMobileContextMenu_ToggleLikeItemEventFactory, SPTExternalIntegrationCollectionController, SPTFeatureFlagSignalObserver, SPTUIPresentationService, SPTService, SPTServiceProvider, SPContextMenuActionsFactory, SPTCollectionPlatform, HUBViewModel, HUBComponentModel, HUBComponentLayoutManager, SPTFreeTierEntityFeedbackButtonViewModelDelegate, SPTFreeTierEntityFeedbackButtonViewModel, SPTContextMenuActionsProvider;
+
+@protocol SPTCollectionPlatformConfiguration <NSObject>
+- (unsigned long long)banActionTypeForURL:(NSURL *)arg1 contextURL:(NSURL *)arg2;
+- (NSString *)localfilesImportDialogForPlaylistCount:(unsigned long long)arg1 songsCount:(unsigned long long)arg2;
+- (NSString *)entityNuxTitleForType:(unsigned long long)arg1 entityName:(NSString *)arg2;
+- (NSString *)nuxTitleForType:(unsigned long long)arg1;
+- (UIBarButtonItem *)provideCollectionActionButtonItemForEntityType:(unsigned long long)arg1 target:(id)arg2 action:(SEL)arg3;
+//- (GLUEButton *)provideCollectionActionButtonForEntityType:(unsigned long long)arg1 target:(id)arg2 action:(SEL)arg3;
+- (void)showCollectionConfirmationProgressViewForBannedState:(_Bool)arg1 entityURL:(NSURL *)arg2 inContextURL:(NSURL *)arg3;
+- (void)showCollectionConfirmationProgressViewForAddedState:(_Bool)arg1 entityURL:(NSURL *)arg2 entityName:(NSString *)arg3 isDownload:(_Bool)arg4;
+- (void)showCollectionConfirmationProgressViewForAddedState:(_Bool)arg1 entityURL:(NSURL *)arg2 entityName:(NSString *)arg3;
+- (void)showCollectionConfirmationProgressViewForAddedState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (NSString *)actionNameForArtistWithBanState:(_Bool)arg1;
+- (unsigned long long)actionIconForArtistWithBanState:(_Bool)arg1;
+- (NSString *)actionAccessibilityHintWithBanState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (NSString *)actionNameForItemWithCollectionLocalBanState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (NSString *)actionNameForItemWithCollectionBanState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (UIColor *)actionIconColorForItemWithCollectionBanState:(_Bool)arg1;
+- (unsigned long long)actionIconForItemWithCollectionLocalBanState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (unsigned long long)actionIconForItemWithCollectionBanState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (NSString *)actionNameForItemWithFollowState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (unsigned long long)actionIconForItemWithFollowState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (NSString *)actionAccessibilityHintWithCollectionState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (NSString *)actionNameForTrackWithCollectionState:(_Bool)arg1;
+- (NSString *)actionNameForItemWithCollectionState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (UIColor *)actionIconColorForItemWithCollectionState:(_Bool)arg1;
+- (unsigned long long)actionIconForItemWithCollectionState:(_Bool)arg1 entityURL:(NSURL *)arg2;
+- (unsigned long long)iconForItemInCollection:(_Bool)arg1 entityURL:(NSURL *)arg2;
+@property(nonatomic, readonly) NSString *collectionSongsSearchPlaceholder;
+@property(nonatomic, readonly) NSURL *collectionYourEpisodesImageURL;
+@property(nonatomic, readonly) NSURL *collectionSongsImageURL;
+@property(nonatomic, readonly) unsigned long long collectionIcon;
+@property(nonatomic, readonly) NSString *collectionYourEpisodesTitle;
+@property(nonatomic, readonly) NSString *collectionRecentlyPlayedSongsTitle;
+@property(nonatomic, readonly) NSString *collectionSongsTitle;
+@property(nonatomic, readonly) NSString *collectionPlayingFromTitle;
+@property(nonatomic, readonly) NSString *collectionTitle;
+@end
+
+@protocol SPTExternalIntegrationCollectionControllerObserver <NSObject>
+- (void)didReceiveUpdatedCollectionNotification;
+- (void)externalIntegrationCollectionController:(id <SPTExternalIntegrationCollectionController>)arg1 didReceiveNewCollectionStateForCurrentTrack:(_Bool)arg2;
+@end
+
+@protocol SPTExternalIntegrationCollectionController <NSObject>
+- (void)removeObserver:(id <SPTExternalIntegrationCollectionControllerObserver>)arg1;
+- (void)addObserver:(id <SPTExternalIntegrationCollectionControllerObserver>)arg1;
+- (void)removeContentFromCollectionWithURI:(NSURL *)arg1 completionHandler:(void (^)(_Bool))arg2;
+- (void)addContentToCollectionWithURI:(NSURL *)arg1 fromContext:(NSURL *)arg2 completionHandler:(void (^)(_Bool))arg3;
+- (_Bool)canAddTrackToCollectionWithURI:(NSURL *)arg1;
+- (void)collectionContainsContentWithURI:(NSURL *)arg1 completionHandler:(void (^)(_Bool))arg2;
+@property(readonly, nonatomic) id <SPTCollectionPlatformConfiguration> configuration;
+@end
+
+@interface SPTLogMessage : NSObject
+@end
+
+@protocol SPTUBILogger <NSObject>
+- (NSString *)logNonAuthenticatedImpression:(UBIImpressionEvent *)arg1;
+- (NSString *)logImpression:(UBIImpressionEvent *)arg1;
+- (NSString *)logNonAuthenticatedInteraction:(UBIInteractionEvent *)arg1;
+- (NSString *)logInteraction:(UBIInteractionEvent *)arg1;
+@end
+
+@protocol SPTLinkDispatcher <NSObject>
+- (void)DEPRECATED_navigateToURI:(NSURL *)arg1 options:(long long)arg2;
+- (void)navigateToURI:(NSURL *)arg1 options:(long long)arg2 interactionID:(NSString *)arg3;
+- (void)DEPRECATED_navigateToURI:(NSURL *)arg1 sourceApplication:(NSString *)arg2 annotation:(id)arg3 options:(long long)arg4 completionHandler:(void (^)(_Bool))arg5;
+- (void)navigateToURI:(NSURL *)arg1 sourceApplication:(NSString *)arg2 annotation:(id)arg3 options:(long long)arg4 interactionID:(NSString *)arg5 completionHandler:(void (^)(_Bool))arg6;
+- (_Bool)canOpenURI:(NSURL *)arg1 allowExternalApps:(_Bool)arg2;
+@end
+
+@protocol SPTLogCenter <NSObject>
+- (_Bool)sendMessageWithSequenceNumber:(NSNumber *)arg1 messageName:(NSString *)arg2;
+- (_Bool)updateMessageWithSequenceNumber:(NSNumber *)arg1 messageName:(NSString *)arg2 message:(SPTLogMessage *)arg3;
+- (NSDictionary *)createMessage:(NSString *)arg1;
+- (void)sendMessage:(SPTLogMessage *)arg1;
+@end
+
+@protocol SPTModalPresentationController <NSObject>
+- (void)dismissViewController:(UIViewController *)arg1 animated:(_Bool)arg2 completion:(void (^)(void))arg3;
+- (void)presentViewController:(UIViewController *)arg1 animated:(_Bool)arg2 completion:(void (^)(void))arg3;
+@end
+
+@protocol SPTPopoverPresentationController <NSObject>
+- (void)dismissViewControllerAnimated:(_Bool)arg1 fromParentViewController:(UIViewController *)arg2 completion:(void (^)(void))arg3;
+- (void)presentViewControllerWithPopoverPresentation:(UIViewController *)arg1 onParentViewController:(UIViewController *)arg2 fromView:(UIView *)arg3 permittedArrowDirections:(unsigned long long)arg4 animated:(_Bool)arg5 completion:(void (^)(void))arg6;
+- (void)presentViewControllerWithPopoverPresentation:(UIViewController *)arg1 onParentViewController:(UIViewController *)arg2 fromBarButtonItem:(UIBarButtonItem *)arg3 permittedArrowDirections:(unsigned long long)arg4 animated:(_Bool)arg5 completion:(void (^)(void))arg6;
+@end
+
+@protocol SPTContributingArtistsUIProvider <NSObject>
+- (UIViewController *)provideContributingArtistsListViewController;
+@end
+
+@protocol SPTContributingArtistsService <SPTService>
+- (id <SPTContributingArtistsUIProvider>)UIProviderForArtistEntities:(NSArray *)arg1;
+@end
+
+@protocol SPTFeatureFlagSignal <NSObject>
+- (void)removeObserver:(id <SPTFeatureFlagSignalObserver>)arg1;
+- (void)addObserver:(id <SPTFeatureFlagSignalObserver>)arg1;
+@end
+
+@interface SPTAllocationContext : NSObject
+
++ (void)setDefaultLogHandler:(id)arg1;
++ (id)currentContext;
+@property(copy) id logHandler;
+- (void)setIdentifier:(id)arg1;
+@property(readonly, copy) NSString *identifier;
+- (void)assertEmpty;
+- (void)forgetAllObjects;
+- (void)exit;
+- (void)enter;
+- (id)init;
+- (id)initWithIdentifier:(id)arg1;
+
+@end
+
+@protocol SPTService <NSObject>
++ (NSString *)serviceIdentifier;
+- (id)init;
+
+@optional
++ (_Bool)shouldBeLoadedLazily;
+- (void)idleStateWasReached;
+- (void)initialViewDidAppear;
+- (void)load;
+- (void)unload;
+- (void)configureWithServices:(id <SPTServiceProvider>)arg1;
+@property(nonatomic, retain) SPTAllocationContext *allocationContext;
+@end
+
+
+@protocol SPTFeatureFlagSignalObserver <NSObject>
+- (void)featureFlagSignal:(id <SPTFeatureFlagSignal>)arg1 hasAssumedState:(long long)arg2;
+@end
 
 @protocol SPTUBIPageInstanceIdentifierProvider <NSObject>
 @property(nonatomic, readonly) NSString *currentPageInstanceId;
@@ -864,7 +1001,7 @@
 - (SPTask *)viewArtistWithURL:(NSURL *)arg1 logContext:(NSString *)arg2;
 @end
 
-/*@interface SPTContextMenuActionsProviderImplementation : NSObject <SPTFeatureFlagSignalObserver, SPTContextMenuActionsProvider>
+@interface SPTContextMenuActionsProviderImplementation : NSObject <SPTFeatureFlagSignalObserver, SPTContextMenuActionsProvider>
 {
     _Bool _freeTierEnabled;
     id <SPContextMenuActionsFactory> _actionsFactory;
@@ -873,7 +1010,6 @@
     id <SPTFeatureFlagSignal> _freeTierEnabledSignal;
 }
 
-- (void).cxx_destruct;
 @property(nonatomic) _Bool freeTierEnabled; // @synthesize freeTierEnabled=_freeTierEnabled;
 @property(readonly, nonatomic) id <SPTFeatureFlagSignal> freeTierEnabledSignal; // @synthesize freeTierEnabledSignal=_freeTierEnabledSignal;
 @property(readonly, nonatomic) __weak id <SPTContributingArtistsService> contributingArtistService; // @synthesize contributingArtistService=_contributingArtistService;
@@ -900,7 +1036,7 @@
 @property(readonly, copy) NSString *description;
 @property(readonly) Class superclass;
 
-@end*/
+@end
 
 @interface SPTask : NSObject <SPCallbackHolderParent>
 {
@@ -1022,6 +1158,42 @@
 
 @end
 
+@interface UBILogger : NSObject
+/*{
+    id <UBIEventSender> _eventSender;
+    id <UBIPageInstanceIdProvider> _pageInstanceIdProvider;
+    id <UBIPlaybackIdProvider> _playbackIdProvider;
+    id <UBILoggerObserver> _observer;
+}
+
+@property(retain, nonatomic) id <UBILoggerObserver> observer; // @synthesize observer=_observer;
+@property(retain, nonatomic) id <UBIPlaybackIdProvider> playbackIdProvider; // @synthesize playbackIdProvider=_playbackIdProvider;
+@property(retain, nonatomic) id <UBIPageInstanceIdProvider> pageInstanceIdProvider; // @synthesize pageInstanceIdProvider=_pageInstanceIdProvider;
+@property(retain, nonatomic) id <UBIEventSender> eventSender; // @synthesize eventSender=_eventSender;*/
+- (id)numberOfNil:(id)arg1;
+- (id)arrayOfStringsOrNil:(id)arg1;
+- (id)stringOrNil:(id)arg1;
+- (id)dictionaryOrNil:(id)arg1;
+- (void)addDataToImpression:(id)arg1 fromCarThingImpression:(id)arg2;
+- (void)addDataToInteraction:(id)arg1 fromCarThingInteraction:(id)arg2;
+- (void)addParentPathToEvent:(id)arg1 fromParentLocation:(id)arg2;
+- (void)addActionParametersToEvent:(id)arg1 fromInteraction:(id)arg2;
+- (void)addPathToEvent:(id)arg1 fromComponents:(id)arg2;
+- (void)addPlaybackIdIfNeededToImpressionEvent:(id)arg1;
+- (void)addPlaybackIdIfNeededToInteractionEvent:(id)arg1;
+- (id)addDataToMessage:(id)arg1 withId:(id)arg2 fromImpression:(id)arg3;
+- (id)addDataToMessage:(id)arg1 withId:(id)arg2 fromInteraction:(id)arg3;
+- (void)forwardImpression:(id)arg1;
+- (void)forwardInteraction:(id)arg1;
+- (id)logNonAuthenticatedImpression:(id)arg1;
+- (id)logImpression:(id)arg1;
+- (id)logNonAuthenticatedInteraction:(id)arg1;
+- (id)logInteraction:(id)arg1;
+- (id)version;
+- (id)initWithEventSender:(id)arg1 pageInstanceIdProvider:(id)arg2 playbackIdProvider:(id)arg3 observer:(id)arg4;
+
+@end
+
 @interface SPTFreeTierAlbumViewController : SPTHubViewController
 //@property(retain, nonatomic) SPTProgressView *progressView; // @synthesize progressView=_progressView;
 @property(readonly, nonatomic) id <SPTUBIPageInstanceIdentifierProvider> pageInstanceIdProvider; // @synthesize pageInstanceIdProvider=_pageInstanceIdProvider;
@@ -1046,6 +1218,18 @@
 @property(readonly, copy) NSString *debugDescription;
 @property(readonly, copy) NSString *description;
 @property(readonly) Class superclass;
+@end
+
+@interface SPTEsperantoPlayer : NSObject
+- (id)updateWithContext:(id)arg1;
+- (id)preparePlaybackOfContext:(id)arg1 options:(id)arg2 viewURI:(id)arg3;
+- (id)playContext:(id)arg1 options:(id)arg2 loggingParams:(id)arg3 origin:(id)arg4;
+- (id)playContext:(id)arg1 options:(id)arg2 origin:(id)arg3;
+- (id)playContext:(id)arg1 options:(id)arg2 externalReferrer:(id)arg3;
+- (id)playContext:(id)arg1 options:(id)arg2 loggingParams:(id)arg3 viewURI:(id)arg4;
+- (id)playContext:(id)arg1 options:(id)arg2 viewURI:(id)arg3;
+- (id)playContext:(id)arg1 options:(id)arg2 loggingParams:(id)arg3;
+- (id)playContext:(id)arg1 options:(id)arg2;
 @end
 
 @interface HUBContainerView : UIView
@@ -1417,4 +1601,303 @@
 @property(readonly, copy) NSString *description;
 @property(readonly) Class superclass;
 
+@end
+
+@protocol SPContextMenuActionsFactory <NSObject>
+- (SPTask *)actionForURI:(NSURL *)arg1 logContext:(NSString *)arg2 title:(NSString *)arg3 imageURL:(NSURL *)arg4 actionIdentifier:(unsigned long long)arg5;
+- (SPTask *)actionForURIs:(NSArray *)arg1 logContext:(NSString *)arg2 sourceURL:(NSURL *)arg3 containerURL:(NSURL *)arg4 playlistName:(NSString *)arg5 actionIdentifier:(unsigned long long)arg6 contextSourceURL:(NSURL *)arg7;
+- (SPTask *)actionForURI:(NSURL *)arg1 logContext:(NSString *)arg2 sourceURL:(NSURL *)arg3 tracks:(NSArray *)arg4 actionIdentifier:(unsigned long long)arg5;
+- (SPTask *)actionForURI:(NSURL *)arg1 logContext:(NSString *)arg2 sourceURL:(NSURL *)arg3 itemName:(NSString *)arg4 creatorName:(NSString *)arg5 sourceName:(NSString *)arg6 imageURL:(NSURL *)arg7 clipboardLinkTitle:(NSString *)arg8 actionIdentifier:(unsigned long long)arg9;
+- (SPTask *)actionForURI:(NSURL *)arg1 logContext:(NSString *)arg2 sourceURL:(NSURL *)arg3 contextURL:(NSURL *)arg4 actionIdentifier:(unsigned long long)arg5;
+- (SPTask *)actionForURI:(NSURL *)arg1 logContext:(NSString *)arg2 sourceURL:(NSURL *)arg3 actionIdentifier:(unsigned long long)arg4;
+- (void)registerActionForCarThingPredicate:(SPTask * (^)(NSURL *, NSString *, NSString *, NSURL *))arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForURIContainerPredicate:(SPTask * (^)(NSArray *, NSString *, NSURL *, NSURL *, NSURL *, NSString *))arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForTracksPredicate:(SPTask * (^)(NSURL *, NSString *, NSURL *, NSArray *))arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForSharePredicate:(SPTask * (^)(NSURL *, NSString *, NSURL *, NSString *, NSString *, NSString *, NSURL *, NSString *))arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForEntityInContextPredicate:(SPTask * (^)(NSURL *, NSString *, NSURL *, NSURL *))arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForShortPredicate:(SPTask * (^)(NSURL *, NSString *, NSURL *))arg1 actionIdentifier:(unsigned long long)arg2;
+- (SPTask *)offlineSync:(NSURL *)arg1 isOffline:(_Bool)arg2 collectionPlatform:(id <SPTCollectionPlatform>)arg3 collectionOptions:(SPTCollectionPlatformFetchOptions *)arg4 logContext:(NSString *)arg5;
+- (SPTask *)viewAlbumWithAlbumURL:(NSURL *)arg1 logContext:(NSString *)arg2;
+- (SPTask *)viewArtists:(NSArray *)arg1 logContext:(NSString *)arg2 presentationService:(id <SPTUIPresentationService>)arg3 contributingArtistsService:(id <SPTContributingArtistsService>)arg4;
+- (SPTask *)viewArtistWithURL:(NSURL *)arg1 logContext:(NSString *)arg2;
+@end
+
+@interface SPContextMenuActionsFactoryImplementation : NSObject <SPContextMenuActionsFactory>
+{
+    id <SPTLogCenter> _logCenter;
+    id <SPTLinkDispatcher> _linkDispatcher;
+    id <SPTUBILogger> _ubiLogger;
+    NSMutableDictionary *_shortURLPredicates;
+    NSMutableDictionary *_entityInURLPredicates;
+    NSMutableDictionary *_shareURLPredicates;
+    NSMutableDictionary *_tracksPredicates;
+    NSMutableDictionary *_containerPredicates;
+    NSMutableDictionary *_carThingPredicates;
+}
+
+@property(readonly, nonatomic) NSMutableDictionary *carThingPredicates; // @synthesize carThingPredicates=_carThingPredicates;
+@property(readonly, nonatomic) NSMutableDictionary *containerPredicates; // @synthesize containerPredicates=_containerPredicates;
+@property(readonly, nonatomic) NSMutableDictionary *tracksPredicates; // @synthesize tracksPredicates=_tracksPredicates;
+@property(readonly, nonatomic) NSMutableDictionary *shareURLPredicates; // @synthesize shareURLPredicates=_shareURLPredicates;
+@property(readonly, nonatomic) NSMutableDictionary *entityInURLPredicates; // @synthesize entityInURLPredicates=_entityInURLPredicates;
+@property(readonly, nonatomic) NSMutableDictionary *shortURLPredicates; // @synthesize shortURLPredicates=_shortURLPredicates;
+@property(readonly, nonatomic) id <SPTUBILogger> ubiLogger; // @synthesize ubiLogger=_ubiLogger;
+@property(readonly, nonatomic) id <SPTLinkDispatcher> linkDispatcher; // @synthesize linkDispatcher=_linkDispatcher;
+@property(readonly, nonatomic) id <SPTLogCenter> logCenter; // @synthesize logCenter=_logCenter;
+- (id)ubiInteraction:(unsigned long long)arg1 inSourceURL:(id)arg2 targetURL:(id)arg3;
+- (void)attachUBIInteractionLoggingToTask:(id)arg1 actionIdentifier:(unsigned long long)arg2 inSourceURL:(id)arg3 targetURL:(id)arg4;
+- (void)registerActionForPredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2 in:(id)arg3;
+- (id)actionForURI:(id)arg1 logContext:(id)arg2 title:(id)arg3 imageURL:(id)arg4 actionIdentifier:(unsigned long long)arg5;
+- (id)actionForURIs:(id)arg1 logContext:(id)arg2 sourceURL:(id)arg3 containerURL:(id)arg4 playlistName:(id)arg5 actionIdentifier:(unsigned long long)arg6 contextSourceURL:(id)arg7;
+- (id)actionForURI:(id)arg1 logContext:(id)arg2 sourceURL:(id)arg3 tracks:(id)arg4 actionIdentifier:(unsigned long long)arg5;
+- (id)actionForURI:(id)arg1 logContext:(id)arg2 sourceURL:(id)arg3 itemName:(id)arg4 creatorName:(id)arg5 sourceName:(id)arg6 imageURL:(id)arg7 clipboardLinkTitle:(id)arg8 actionIdentifier:(unsigned long long)arg9;
+- (id)actionForURI:(id)arg1 logContext:(id)arg2 sourceURL:(id)arg3 contextURL:(id)arg4 actionIdentifier:(unsigned long long)arg5;
+- (id)actionForURI:(id)arg1 logContext:(id)arg2 sourceURL:(id)arg3 actionIdentifier:(unsigned long long)arg4;
+- (void)registerActionForCarThingPredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForURIContainerPredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForTracksPredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForSharePredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForEntityInContextPredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2;
+- (void)registerActionForShortPredicate:(id)arg1 actionIdentifier:(unsigned long long)arg2;
+- (id)offlineSync:(id)arg1 isOffline:(_Bool)arg2 collectionPlatform:(id)arg3 collectionOptions:(id)arg4 logContext:(id)arg5;
+- (id)viewAlbumWithAlbumURL:(id)arg1 logContext:(id)arg2;
+- (id)viewArtists:(id)arg1 logContext:(id)arg2 presentationService:(id)arg3 contributingArtistsService:(id)arg4;
+- (id)viewArtistWithURL:(id)arg1 logContext:(id)arg2;
+- (id)initWithLogCenter:(id)arg1 linkDispatcher:(id)arg2 ubiLogger:(id)arg3;
+
+// Remaining properties
+@property(readonly, copy) NSString *debugDescription;
+@property(readonly, copy) NSString *description;
+@property(readonly) Class superclass;
+
+@end
+
+@protocol SPTUIPresentationService <NSObject, SPTService>
+- (id <SPTPopoverPresentationController>)providePopoverPresentationController;
+//- (id <SPTModalPresentationController><UIAdaptivePresentationControllerDelegate>)provideModalPresentationController;
+@end
+
+@interface SPTNowPlayingAuxiliaryActionsModel : NSObject
+{
+    _Bool _inCollection;
+    _Bool _inBannedCollection;
+    id <SPTCollectionPlatform> _collectionPlatform;
+//    id <SPTAdsManager> _adsManager;
+//    id <SPTNowPlayingTestManager> _testManager;
+//    SPTStatefulPlayer *_statefulPlayer;
+    NSHashTable *_observers;
+}
+
+@property(retain, nonatomic) NSHashTable *observers; // @synthesize observers=_observers;
+//@property(retain, nonatomic) SPTStatefulPlayer *statefulPlayer; // @synthesize statefulPlayer=_statefulPlayer;
+//@property(nonatomic) __weak id <SPTNowPlayingTestManager> testManager; // @synthesize testManager=_testManager;
+//@property(nonatomic) __weak id <SPTAdsManager> adsManager; // @synthesize adsManager=_adsManager;
+@property(nonatomic) __weak id <SPTCollectionPlatform> collectionPlatform; // @synthesize collectionPlatform=_collectionPlatform;
+@property(nonatomic, getter=isInBannedCollection) _Bool inBannedCollection; // @synthesize inBannedCollection=_inBannedCollection;
+@property(nonatomic, getter=isInCollection) _Bool inCollection; // @synthesize inCollection=_inCollection;
+- (void)playerDidUpdateTrackPosition:(id)arg1;
+- (void)playerDidUpdatePlaybackControls:(id)arg1;
+- (void)player:(id)arg1 didMoveToRelativeTrack:(id)arg2;
+- (void)playerDidReceiveStateUpdate:(id)arg1;
+- (void)collectionPlatformDidChange:(id)arg1;
+- (void)dealloc;
+- (id)playingContextURL;
+@property(readonly, nonatomic) NSString *subtitle;
+@property(readonly, nonatomic) NSURL *subtitleClickURL;
+@property(readonly, nonatomic) NSURL *adsURLToOpen;
+@property(readonly, nonatomic) _Bool disableInteractiveTransitionForAd;
+@property(readonly, nonatomic) _Bool videoOfferInProgress;
+@property(readonly, nonatomic) _Bool disallowOpeningContextAndShareMenu;
+- (void)updateCollectionState;
+- (void)notifyObservers;
+- (void)setInBannedCollectionAndNotifyObservers:(_Bool)arg1;
+- (void)setInCollectionAndNotifyObservers:(_Bool)arg1;
+- (void)updateStateForCurrentTrack;
+- (void)removeBanFromCollectionWithConfirmation:(_Bool)arg1;
+- (void)removeBanFromCollection;
+- (void)banFromCollectionWithConfirmation:(_Bool)arg1;
+- (void)banFromCollection;
+- (void)addToCollectionWithConfirmation:(_Bool)arg1;
+- (void)addToCollection;
+- (void)removeFromCollectionWithConfirmation:(_Bool)arg1;
+- (void)removeFromCollection;
+@property(readonly, nonatomic) _Bool disallowAddingToCollection;
+- (id)currentTrack;
+- (void)removeObserver:(id)arg1;
+- (void)addObserver:(id)arg1;
+- (id)initWithCollectionPlatform:(id)arg1 adsManager:(id)arg2 testManager:(id)arg3 statefulPlayer:(id)arg4;
+- (_Bool)updateShowFollowState;
+- (_Bool)unfollowShow;
+- (_Bool)followShow;
+- (_Bool)disallowFollowShow;
+
+// Remaining properties
+@property(readonly, copy) NSString *debugDescription;
+@property(readonly, copy) NSString *description;
+@property(readonly) Class superclass;
+
+@end
+
+@interface SPTExternalIntegrationCollectionControllerImplementation : NSObject
+- (id)initWithCollectionPlatform:(id)arg1 collectionPlatformTestManager:(id)arg2 playlistPlatformService:(id)arg3 playbackController:(id)arg4 followFactory:(id)arg5 debugLog:(id)arg6;
+- (void)addContentToCollectionWithURI:(id)arg1 fromContext:(id)arg2 completionHandler:(id)arg3;
+- (void)changeTrackCollectionStateWithURI:(id)arg1 fromContext:(id)arg2 add:(_Bool)arg3 completionHandler:(id)arg4;
+- (void)removeContentFromCollectionWithURI:(id)arg1 completionHandler:(id)arg2;
+- (void)collectionContainsContentWithTrackURI:(id)arg1 completionHandler:(id)arg2;
+- (void)collectionContainsContentWithURI:(id)arg1 completionHandler:(id)arg2;
+- (_Bool)canAddTrackToCollectionWithURI:(id)arg1;
+@end
+
+@protocol SPTUBIPDTMobileContextMenu_ToggleLikeItemEventFactory <NSObject>
+- (UBIInteractionEvent *)hitRemoveLikeWithItemNoLongerLiked:(NSURL *)arg1;
+- (UBIInteractionEvent *)hitLikeWithItemToBeLiked:(NSURL *)arg1;
+- (UBIImpressionEvent *)impression;
+- (UBIEventAbsoluteLocation *)absoluteLocation;
+- (UBIEventLocation *)_location;
+@end
+
+@interface SPTUBIPDTMobileContextMenu_ToggleLikeItemEventFactoryImplementation : NSObject <SPTUBIPDTMobileContextMenu_ToggleLikeItemEventFactory>
+{
+    NSArray *_components;
+    UBIEventAbsoluteLocation *_parentAbsoluteLocation;
+}
+
++ (id)factoryWithComponents:(id)arg1 parentAbsoluteLocation:(id)arg2;
+@property(retain, nonatomic) UBIEventAbsoluteLocation *parentAbsoluteLocation; // @synthesize parentAbsoluteLocation=_parentAbsoluteLocation;
+@property(copy, nonatomic) NSArray *components; // @synthesize components=_components;
+- (id)hitRemoveLikeWithItemNoLongerLiked:(id)arg1;
+- (id)hitLikeWithItemToBeLiked:(id)arg1;
+- (id)impression;
+- (id)absoluteLocation;
+- (id)_location;
+- (id)initWithComponents:(id)arg1 parentAbsoluteLocation:(id)arg2;
+
+// Remaining properties
+@property(readonly, copy) NSString *debugDescription;
+@property(readonly, copy) NSString *description;
+@property(readonly) Class superclass;
+
+@end
+
+@protocol SPTUBIPDTMobileContextMenu_ToggleLikeAllItemEventFactory <NSObject>
+- (UBIInteractionEvent *)hitRemoveLikeAllFromEntityWithEntityUri:(NSURL *)arg1;
+- (UBIInteractionEvent *)hitLikeAllFromEntityWithEntityUri:(NSURL *)arg1;
+- (UBIImpressionEvent *)impression;
+- (UBIEventAbsoluteLocation *)absoluteLocation;
+- (UBIEventLocation *)_location;
+@end
+
+@interface SPTUBIPDTMobileContextMenu_ToggleLikeAllItemEventFactoryImplementation : NSObject <SPTUBIPDTMobileContextMenu_ToggleLikeAllItemEventFactory>
+{
+    NSArray *_components;
+    UBIEventAbsoluteLocation *_parentAbsoluteLocation;
+}
+
++ (id)factoryWithComponents:(id)arg1 parentAbsoluteLocation:(id)arg2;
+@property(retain, nonatomic) UBIEventAbsoluteLocation *parentAbsoluteLocation; // @synthesize parentAbsoluteLocation=_parentAbsoluteLocation;
+@property(copy, nonatomic) NSArray *components; // @synthesize components=_components;
+- (id)hitRemoveLikeAllFromEntityWithEntityUri:(id)arg1;
+- (id)hitLikeAllFromEntityWithEntityUri:(id)arg1;
+- (id)impression;
+- (id)absoluteLocation;
+- (id)_location;
+- (id)initWithComponents:(id)arg1 parentAbsoluteLocation:(id)arg2;
+
+// Remaining properties
+@property(readonly, copy) NSString *debugDescription;
+@property(readonly, copy) NSString *description;
+@property(readonly) Class superclass;
+
+@end
+
+@interface SPTUBIPDTMobileContextMenuEventFactoryImplementation : NSObject
+{
+    NSArray *_components;
+    UBIEventAbsoluteLocation *_parentAbsoluteLocation;
+}
+
++ (id)factoryWithPageUri:(id)arg1 parentAbsoluteLocation:(id)arg2;
++ (id)factoryWithPageUri:(id)arg1;
+@property(retain, nonatomic) UBIEventAbsoluteLocation *parentAbsoluteLocation; // @synthesize parentAbsoluteLocation=_parentAbsoluteLocation;
+@property(copy, nonatomic) NSArray *components; // @synthesize components=_components;
+- (id)toggleLikeAllItemFactory;
+- (id)addToProfileOptionFactory;
+- (id)togglePlaylistPrivacyItemFactory;
+- (id)togglePinItemFactory;
+- (id)findInShowItemFactory;
+- (id)promoDisclosureFactory;
+- (id)lessLikeThisFactory;
+- (id)moreLikeThisFactory;
+- (id)showSubtitlesItemFactory;
+- (id)showLyricsItemFactory;
+- (id)toggleHideArtistItemFactory;
+- (id)toggleExplicitContentItemFactory;
+- (id)queueTrackPlayLaterItemFactory;
+- (id)queueTrackPlayNextItemFactory;
+- (id)podcastMixDislikeShowItemFactory;
+- (id)podcastMixManageEpisodeItemFactory;
+- (id)canvasEnhancedPlaylistItemFactory;
+- (id)watchUiDownloadActionItemFactory;
+- (id)addReportItemFactory;
+- (id)canvasChangePlaybackSettingsItemFactory;
+- (id)addVideoToggleItemFactory;
+- (id)addVideoSubtitlesItemFactory;
+- (id)carThingItemFactory;
+- (id)reminderActionItemFactory;
+- (id)addShowLyricsItemFactory;
+- (id)freeTierRenamePlaylistItemFactory;
+- (id)renamePlaylistItemFactory;
+- (id)toggleShuffleModeItemFactory;
+- (id)toggleRepeatModeItemFactory;
+- (id)openPlaybackSpeedItemFactory;
+- (id)openSleepTimerItemFactory;
+- (id)browseArtistsItemFactory;
+- (id)findFriendsItemFactory;
+- (id)togglePlaylistPublicFactory;
+- (id)togglePlaylistCollaborativeItemFactory;
+- (id)toggleFollowItemFactory;
+- (id)createRadioItemFactory;
+- (id)showCreditsItemFactory;
+- (id)thumbsDownButtonFactory;
+- (id)thumbsUpButtonFactory;
+- (id)shareItemFactory;
+- (id)reportAbuseItemFactory;
+- (id)deletePlaylistItemFactory;
+- (id)removeFromPlaylistItemFactory;
+- (id)addItemsToQueueFactory;
+- (id)addItemToQueueFactory;
+- (id)toggleLikeItemFactory;
+- (id)toggleHideSongItemFactory;
+- (id)toggleDownloadItemFactory;
+- (id)toggleMarkAsPlayedItemFactory;
+- (id)browseQueueItemFactory;
+- (id)editPlaylistItemFactory;
+- (id)browsePodcastItemFactory;
+- (id)browsePlaylistItemFactory;
+- (id)browseEpisodeItemFactory;
+- (id)browseArtistItemFactory;
+- (id)browseAlbumItemFactory;
+- (id)hideSongItemFactory;
+- (id)addToPlaylistItemFactory;
+- (id)addAppShortcutItemFactory;
+- (id)absoluteLocation;
+- (id)_location;
+- (id)initWithPageUri:(id)arg1 parentAbsoluteLocation:(id)arg2;
+
+// Remaining properties
+@property(readonly, copy) NSString *debugDescription;
+@property(readonly, copy) NSString *description;
+@property(readonly) Class superclass;
+
+@end
+
+@interface SPTExternalIntegrationAlbumContentDataLoader : NSObject
+@property(copy, nonatomic) id completionHandler; // @synthesize completionHandler=_completionHandler;
+//@property(readonly, nonatomic) SPTDataLoader *dataLoader; // @synthesize dataLoader=_dataLoader;
+- (void)dataLoader:(id)arg1 didReceiveErrorResponse:(id)arg2;
+- (void)dataLoader:(id)arg1 didReceiveSuccessfulResponse:(id)arg2;
+- (id)endpointPathComponentsForAlbumURL:(id)arg1;
+- (void)requestDataForURI:(id)arg1 completionHandler:(id)arg2;
+- (void)dealloc;
+- (id)initWithDataLoader:(id)arg1;
 @end
